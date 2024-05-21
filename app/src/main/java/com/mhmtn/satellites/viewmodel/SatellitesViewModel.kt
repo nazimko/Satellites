@@ -12,6 +12,7 @@ import com.mhmtn.satellites.model.Satellites
 import com.mhmtn.satellites.repo.SatellitesRepo
 import com.mhmtn.satellites.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,6 +28,9 @@ class SatellitesViewModel @Inject constructor(
 
     @SuppressLint("StaticFieldLeak")
     val context: Context = getApplication<Application>().applicationContext
+
+    private var asılListe = listOf<Satellites>()
+    private var isSearchStarting = true
 
     init {
         loadSatellites()
@@ -57,6 +61,33 @@ class SatellitesViewModel @Inject constructor(
                     isLoading.value = true
                 }
             }
+        }
+    }
+
+    fun searchCryptoList(query : String) {
+        val listToSearch = if(isSearchStarting){
+            satellitesList.value
+        }else{
+            asılListe
+        }
+
+        viewModelScope.launch(Dispatchers.Default){
+
+            if (query.isEmpty()){
+                satellitesList.value=asılListe
+                isSearchStarting=true
+                return@launch
+            }
+
+            val results = listToSearch.filter {
+                it.name.contains(query.trim(),ignoreCase = true)
+            }
+
+            if(isSearchStarting){
+                asılListe = satellitesList.value
+                isSearchStarting=false
+            }
+            satellitesList.value=results
         }
     }
 }

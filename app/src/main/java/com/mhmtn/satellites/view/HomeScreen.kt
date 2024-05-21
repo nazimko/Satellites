@@ -16,19 +16,34 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mhmtn.satellites.model.Satellites
+import com.mhmtn.satellites.ui.theme.Gray80
 import com.mhmtn.satellites.viewmodel.SatellitesViewModel
 
 @Composable
@@ -39,13 +54,61 @@ fun HomeScreen(
 
     Box(modifier = Modifier
         .fillMaxSize()
-        .background(Color.White),
+        .background(Gray80),
         contentAlignment = Alignment.TopCenter){
 
-        SatelliteList(navController = navController)
-
+        Column (verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+            SearchBar(modifier = Modifier.background(color=Gray80).padding(16.dp)){
+                viewModel.searchCryptoList(it)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            SatelliteList(navController = navController)
+        }
+        
     }
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchBar(modifier: Modifier = Modifier,
+              onSearch : (String) -> Unit = {}
+) {
+    var text = remember { mutableStateOf("") }
+
+    Box (modifier = modifier) {
+
+        TextField(value = text.value, onValueChange = {
+            text.value=it
+        },
+            keyboardActions = KeyboardActions(onDone = {onSearch(text.value)}),
+            maxLines = 1,
+            singleLine = true,
+            textStyle = TextStyle(color = MaterialTheme.colorScheme.tertiary),
+            shape = RoundedCornerShape(12.dp),
+            placeholder = { Text(text = "Search") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 6.dp)
+                .background(color = Color.White, CircleShape),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                disabledContainerColor = Color.White
+            ),
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Search Icon"
+                )
+            }
+        )
+    }
+}
+
+
 
 
 @Composable
@@ -93,13 +156,17 @@ fun SatellitesListView(satellites: List<Satellites>, navController: NavControlle
 fun SatelliteRow(navController: NavController, satellite : Satellites) {
 
     Row (horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
          modifier = Modifier
-             .background(color = Color.White)
+             .background(color = Gray80)
              .fillMaxWidth()
+             .padding(4.dp)
              .clickable {
                  //detailscreen
              }) {
-        Canvas(modifier = Modifier.fillMaxHeight(0.5f).padding(20.dp)) {
+        Canvas(modifier = Modifier
+            .fillMaxHeight(0.5f)
+            .padding(16.dp)) {
             drawCircle(
                 color = if (satellite.active) {Color.Green} else Color.Red ,
                 radius = 40f
@@ -107,8 +174,8 @@ fun SatelliteRow(navController: NavController, satellite : Satellites) {
         }
 
         Column {
-            Text(text = satellite.name)
-            Spacer(modifier = Modifier.padding(4.dp))
+            Text(text = satellite.name, fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.padding(2.dp))
             Text(text = if (satellite.active){ "Active" } else "Passive")
         }
         Spacer(modifier = Modifier.height(10.dp))
