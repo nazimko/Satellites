@@ -162,7 +162,7 @@ fun SatelliteRow(navController: NavController, satellite : Satellites) {
              .fillMaxWidth()
              .padding(4.dp)
              .clickable {
-                 //detailscreen
+                 navController.navigate("detail_screen/${satellite.id}/${satellite.name}")
              }) {
         Canvas(modifier = Modifier
             .fillMaxHeight(0.5f)
