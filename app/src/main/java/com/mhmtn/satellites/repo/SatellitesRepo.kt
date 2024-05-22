@@ -1,6 +1,9 @@
 package com.mhmtn.satellites.repo
 
 import android.content.Context
+import com.mhmtn.satellites.model.Positions
+
+import com.mhmtn.satellites.model.Posses
 import com.mhmtn.satellites.model.SatelliteDetail
 import com.mhmtn.satellites.model.Satellites
 import com.mhmtn.satellites.service.SatelliteAPI
@@ -45,6 +48,26 @@ class SatellitesRepo @Inject constructor(private val api : SatelliteAPI){
     private fun getItemById(dataList: List<SatelliteDetail>, targetId:Int) : SatelliteDetail? {
         return dataList.find {
             it.id==targetId
+        }
+    }
+
+    suspend fun getPositions(context: Context,id: Int) : Resource<Posses?> {
+
+        val response = readJsonFromAssets(context,"positions.json")
+
+        val positions =  try {
+            api.parsePositionsJsonToModel(response)
+        } catch (e:Exception) {
+            return Resource.Error("Error.")
+        }
+        val x = getPositionById(positions, targetId = id)
+
+        return Resource.Success(x)
+    }
+
+    private fun getPositionById(dataList: Positions, targetId:Int) : Posses? {
+        return dataList.list.find {
+            it.id.toInt()==targetId
         }
     }
 
