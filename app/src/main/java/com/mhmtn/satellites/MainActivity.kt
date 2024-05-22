@@ -40,17 +40,14 @@ class MainActivity : ComponentActivity() {
                         }
                     )){
 
-                        val satelliteId = remember {
+                        val satelliteId =
                             it.arguments?.getInt("satelliteId")
-                        }
 
-                        val satelliteName = remember {
+                        val satelliteName =
                             it.arguments?.getString("satelliteName")
-                        }
 
-                        DetailScreen(id = satelliteId ?: 1, name = satelliteName ?: "")
+                        DetailScreen(id = satelliteId ?: 0, name = satelliteName ?: "")
                     }
-
                 }
             }
         }

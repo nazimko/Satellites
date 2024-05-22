@@ -1,5 +1,6 @@
 package com.mhmtn.satellites.view
 
+import android.content.Context
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -156,6 +158,8 @@ fun SatellitesListView(satellites: List<Satellites>, navController: NavControlle
 @Composable
 fun SatelliteRow(navController: NavController, satellite : Satellites) {
 
+    val context = LocalContext.current
+
     Row (horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
          modifier = Modifier
@@ -163,7 +167,15 @@ fun SatelliteRow(navController: NavController, satellite : Satellites) {
              .fillMaxWidth()
              .padding(4.dp)
              .clickable {
-                 navController.navigate("detail_screen/${satellite.id}/${satellite.name}")
+                 val sharedPref = context.getSharedPreferences("shared", Context.MODE_PRIVATE)
+                 val savedId = sharedPref.getInt("id_key",0)
+                 val savedName = sharedPref.getString("name_key",null)
+
+                 if (savedId != 0 && savedName != null){
+                     navController.navigate("detail_screen/$savedId/$savedName")
+                 } else {
+                     navController.navigate("detail_screen/${satellite.id}/${satellite.name}")
+                 }
              }) {
         Canvas(modifier = Modifier
             .fillMaxHeight(0.5f)
